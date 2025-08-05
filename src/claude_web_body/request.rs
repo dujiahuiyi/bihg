@@ -12,8 +12,9 @@ use wreq::{
 
 use crate::{
     claude_web_body::{Attachment, RequestBody, Tool},
-    claude_web_state::{ClaudeApiFormat, ClaudeWebState},
+    claude_web_state::ClaudeWebState,
     config::CLEWDR_CONFIG,
+    middleware::claude::ClaudeApiFormat,
     types::claude_message::{
         ContentBlock, CreateMessageParams, ImageSource, Message, MessageContent, Role,
     },
@@ -60,7 +61,8 @@ impl ClaudeWebState {
             max_tokens_to_sample: value.max_tokens,
             attachments: vec![Attachment::new(merged.paste)],
             files: vec![],
-            model: if self.is_pro() {
+            // TODO: hack for sonnet-4, properly handle models later in middleware
+            model: if self.is_pro() && !value.model.contains("sonnet-4") {
                 Some(value.model)
             } else {
                 None
